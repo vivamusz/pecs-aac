@@ -33,11 +33,12 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 @media (max-width:600px){#top{flex-wrap:wrap}#strip{min-height:86px;flex-basis:100%}.tb{flex-direction:row;flex:1}.tb .btn{flex:1}.sc{width:72px;font-size:12px}.sc img{height:50px}.sc.starter{height:78px;font-size:15px}
 .grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px}.card{font-size:15px;min-height:0;border-width:4px}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.g-s .grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}#title{font-size:17px}.btn{font-size:16px;min-height:46px}}
 @media (orientation:landscape) and (max-height:500px){#strip{min-height:70px}.sc img{height:40px}}
+#home-aymaba{display:flex;align-items:center;gap:6px;background:#fff;border-radius:12px;padding:6px 10px;min-height:52px;color:#1f7a6d;font-weight:800;font-size:17px;text-decoration:none}#home-aymaba img{width:32px;height:32px}@media (max-width:600px){#home-aymaba{min-height:46px;font-size:15px}}
 </style></head><body>
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
 <div class="tb"><button class="btn big" id="bSpeak" title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю">⌫</button></div>
 <div class="tb"><button class="btn" id="bClr" title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста">⚙</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><a id="home-aymaba" href="/aymaba/" title="На главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA</a><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
 <div id="choice"><b>Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>

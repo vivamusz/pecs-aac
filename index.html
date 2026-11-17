@@ -63,15 +63,62 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 .grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;padding:10px}.card{font-size:15px;min-height:0;border-width:4px;border-radius:16px;padding:6px}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.g-s .grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}#title{font-size:18px}.btn{font-size:16px;min-height:48px}}
 @media (orientation:landscape) and (max-height:500px){#strip{min-height:70px}.sc img{height:40px}.powered{display:none}}
 img{-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;pointer-events:auto}
+
+/* ===== аудит вёрстки: иконки, окна поверх шапки, режим специалиста, телефон ===== */
+#top .btn{font-size:0!important;display:flex;align-items:center;justify-content:center}
+#top .btn::before{content:"";width:28px;height:28px;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+#bSpeak{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M4 9h4l5-4v14l-5-4H4z'/%3E%3Cpath d='M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12'/%3E%3C/svg%3E");color:var(--ink2)}#bSpeak::before{width:40px!important;height:40px!important}
+#bDel{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M9 5h11v14H9l-6-7z'/%3E%3Cpath d='m12 9 5 6M17 9l-5 6'/%3E%3C/svg%3E")}#bClr{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'/%3E%3C/svg%3E");color:#b4462a}#bSpec{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z'/%3E%3C/svg%3E");color:var(--muted)}
+body:has(#specInfo:not(:empty)) #bSpec{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 7.6-1.8'/%3E%3C/svg%3E");background:var(--green-soft);color:var(--green-dark)}
+.btn svg{width:20px;height:20px;flex:0 0 auto}
+#bBack,#bHome{display:inline-flex;align-items:center;gap:6px}
+.modal{z-index:40}#big{z-index:35}
+/* подписи категорий: перенос по слогам, а не посреди буквы */
+.card .lbl{word-break:normal;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+.cat .lbl{font-size:.92em;line-height:1.2}
+/* панель «Специалист» */
+#specInfo:not(:empty){display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border-radius:999px;background:var(--green-soft);color:var(--green-dark);font-weight:700;font-size:15px;cursor:pointer}
+.edit{position:static;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:6px;order:3}
+.edit button{flex:1 0 40px;min-width:44px;min-height:44px;font-size:18px;padding:4px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer}
+.cat .edit button{background:rgba(255,255,255,.95)}
+.edit button:active{transform:scale(.95)}
+/* окно настроек */
+.box label{display:block;margin:2px 0;font-weight:600;color:var(--ink)}
+.box label:has(>input[type=checkbox]){display:flex;align-items:center;gap:12px;min-height:44px;font-weight:500;cursor:pointer}
+.box input[type=checkbox]{width:24px!important;height:24px;min-height:0;margin:0;flex:0 0 auto;accent-color:var(--green)}
+.box label:has(>input[type=checkbox])+br{display:none}
+.box input[type=range]{accent-color:var(--green);padding:0;min-height:36px;border:0}
+.box .row .btn{flex:1 1 auto}
+.box h3{font-size:22px}
+.box table{margin-top:6px}
+/* быстрые карточки: тонкая прокрутка */
+#quick{scrollbar-width:thin}
+#hdr .menu-toggle{min-width:44px;justify-content:center}
+#pinDisp{font:800 30px/1.2 "Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:10px!important;color:var(--ink)}
+@media (max-width:600px){
+  #bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) 60px 60px;gap:8px}#bar .btn{gap:4px;min-width:0}
+  #title{grid-column:1/-1;order:-1;font-size:20px}
+  #bar .btn{padding:8px 6px;font-size:15px}
+  #specInfo:not(:empty){grid-column:1/-1;justify-content:center}}
+@media (max-width:380px){#bBack svg,#bHome svg{display:none}
+  #top .btn::before{width:24px;height:24px}#bSpeak::before{width:34px!important;height:34px!important}
+}
+@media (orientation:landscape) and (max-height:500px){
+  #hdr .bar{min-height:46px;padding:0 10px}#hdr a.brand{min-height:44px;font-size:17px}#hdr a.brand img{width:28px;height:28px}#hdr .menu-toggle{min-height:44px;padding:6px 10px}
+  #top{padding:6px;gap:6px}#strip{min-height:64px;padding:4px}.sc{width:70px;font-size:12px}.sc.starter{height:66px;font-size:15px}
+  .tb{gap:6px}#top .btn{min-height:44px;min-width:56px;padding:4px 10px}
+  #quick{padding:5px 8px}#quick .q{width:70px;font-size:12px}#quick .q img{height:38px}
+  #bar{padding:6px 12px 2px}#title{font-size:20px}#bar .btn{min-height:44px;padding:6px 12px;font-size:16px}
+}
 </style></head><body>
 <a class="powered" href="https://wa.me/77782577877" target="_blank" rel="noopener noreferrer">powered by vivamusz</a>
 <header id="hdr"><div class="bar"><a class="brand" href="https://vivamusz.github.io/aymaba/" title="На главную AYMABA" aria-label="AYMABA — на главную"><img src="aymaba-logo.svg" alt="" width="36" height="36">AYMABA <span class="sub">← на главную</span></a>
 <button type="button" class="menu-toggle" aria-label="Меню" aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> <span class="menu-label">Меню</span></button>
 <nav id="site-nav" class="nav" aria-label="Меню"><a href="https://vivamusz.github.io/aba-constructor/">Конструктор</a><a href="https://vivamusz.github.io/pecs-aac/" aria-current="page">Коммуникатор</a><a href="https://vivamusz.github.io/aymaba/library.html">Библиотека карточек</a><a href="https://vivamusz.github.io/aymaba/#sets">Наборы для печати</a><a href="https://vivamusz.github.io/aymaba/#pricing">Тарифы</a></nav></div></header>
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
-<div class="tb"><button class="btn big" id="bSpeak" title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю">⌫</button></div>
-<div class="tb"><button class="btn" id="bClr" title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста">⚙</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
+<div class="tb"><button class="btn big" id="bSpeak" title="Сказать" aria-label="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю" aria-label="Удалить последнюю">⌫</button></div>
+<div class="tb"><button class="btn" id="bClr" title="Очистить" aria-label="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста (удерживайте 3 сек)" aria-label="Режим специалиста">⚙</button></div></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Назад</button><button class="btn" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
 <div id="choice"><b>Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>

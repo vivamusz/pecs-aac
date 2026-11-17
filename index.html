@@ -24,7 +24,7 @@ body{margin:0;font-family:"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,s
 /* фразовая полоса */
 #top{position:sticky;top:0;z-index:5;background:var(--green);padding:10px;display:flex;gap:10px;align-items:stretch;box-shadow:0 6px 20px rgba(60,45,20,.12)}
 #strip{flex:1;min-height:120px;background:#fff;border-radius:18px;display:flex;gap:8px;padding:8px;overflow-x:auto;align-items:center;cursor:pointer;box-shadow:inset 0 0 0 2px #cfe7df}
-#strip:empty::before{content:"Нажмите на карточку";color:#9aa8ab;font-size:20px;font-weight:600;padding-left:10px}
+#strip:empty::before{content:attr(data-empty);color:#9aa8ab;font-size:20px;font-weight:600;padding-left:10px}
 .sc{flex:0 0 auto;width:100px;text-align:center;font-size:14px;font-weight:600;border:4px solid #cfe7df;border-radius:14px;background:#fff;padding:2px}
 .sc img{width:100%;height:72px;object-fit:contain}.sc.starter{background:#fde6c4;border-color:var(--peach);display:flex;align-items:center;justify-content:center;height:104px;font-size:20px;font-weight:bold}
 .tb{display:flex;flex-direction:column;gap:8px}
@@ -110,21 +110,35 @@ body:has(#specInfo:not(:empty)) #bSpec{--ico:url("data:image/svg+xml,%3Csvg xmln
   #quick{padding:5px 8px}#quick .q{width:70px;font-size:12px}#quick .q img{height:38px}
   #bar{padding:6px 12px 2px}#title{font-size:20px}#bar .btn{min-height:44px;padding:6px 12px;font-size:16px}
 }
+
+/* RU/KZ — как в конструкторе */
+.lang-sw{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;flex:0 0 auto}
+.lang-sw button{font:inherit;font-weight:800;font-size:15px;letter-spacing:.04em;min-height:44px;min-width:50px;padding:6px 12px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.lang-sw button+button{border-left:1.5px solid var(--line)}
+.lang-sw [aria-pressed="true"]{background:var(--green);color:#fff}
+@media (max-width:420px){#hdr .bname{display:none}.lang-sw button{min-width:44px;padding:6px 8px}}
+/* режим специалиста: карточки крупнее, кнопки ровной сеткой */
+body.spec .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.edit{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.edit:has(>:nth-child(4)){grid-template-columns:repeat(2,1fr)}
+.edit button{min-width:40px;min-height:44px;width:100%}
+@media (max-width:600px){body.spec .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body>
 <a class="powered" href="https://wa.me/77782577877" target="_blank" rel="noopener noreferrer">powered by vivamusz</a>
-<header id="hdr"><div class="bar"><a class="brand" href="https://vivamusz.github.io/aymaba/" title="На главную AYMABA" aria-label="AYMABA — на главную"><img src="aymaba-logo.svg" alt="" width="36" height="36">AYMABA <span class="sub">← на главную</span></a>
-<button type="button" class="menu-toggle" aria-label="Меню" aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> <span class="menu-label">Меню</span></button>
-<nav id="site-nav" class="nav" aria-label="Меню"><a href="https://vivamusz.github.io/aba-constructor/">Конструктор</a><a href="https://vivamusz.github.io/pecs-aac/" aria-current="page">Коммуникатор</a><a href="https://vivamusz.github.io/aymaba/library.html">Библиотека карточек</a><a href="https://vivamusz.github.io/aymaba/#sets">Наборы для печати</a><a href="https://vivamusz.github.io/aymaba/#pricing">Тарифы</a></nav></div></header>
-<div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
-<div class="tb"><button class="btn big" id="bSpeak" title="Сказать" aria-label="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю" aria-label="Удалить последнюю">⌫</button></div>
-<div class="tb"><button class="btn" id="bClr" title="Очистить" aria-label="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста (удерживайте 3 сек)" aria-label="Режим специалиста">⚙</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Назад</button><button class="btn" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
-<div id="choice"><b>Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
+<header id="hdr"><div class="bar"><a class="brand" href="https://vivamusz.github.io/aymaba/" data-i18n-title="На главную AYMABA" title="На главную AYMABA" aria-label="На главную AYMABA"><img src="aymaba-logo.svg" alt="" width="36" height="36"><span class="bname">AYMABA</span> <span class="sub" data-i18n="← на главную">← на главную</span></a>
+<div class="lang-sw" id="langSw" role="group" aria-label="Тіл / Язык"><button type="button" data-lang="ru" aria-pressed="true">RU</button><button type="button" data-lang="kk" aria-pressed="false">KZ</button></div>
+<button type="button" class="menu-toggle" aria-label="Меню" aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> <span class="menu-label" data-i18n="Меню">Меню</span></button>
+<nav id="site-nav" class="nav" aria-label="Меню"><a href="https://vivamusz.github.io/aba-constructor/" data-i18n="Конструктор">Конструктор</a><a href="https://vivamusz.github.io/pecs-aac/" aria-current="page" data-i18n="Коммуникатор">Коммуникатор</a><a href="https://vivamusz.github.io/aymaba/library.html" data-i18n="Библиотека карточек">Библиотека карточек</a><a href="https://vivamusz.github.io/aymaba/#sets" data-i18n="Наборы для печати">Наборы для печати</a><a href="https://vivamusz.github.io/aymaba/#pricing" data-i18n="Тарифы">Тарифы</a></nav></div></header>
+<div id="top"><div id="strip" title="Нажмите, чтобы произнести" data-i18n-title="Нажмите, чтобы произнести" data-empty="Нажмите на карточку"></div>
+<div class="tb"><button class="btn big" id="bSpeak" title="Сказать" aria-label="Сказать" data-i18n-title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю" aria-label="Удалить последнюю" data-i18n-title="Удалить последнюю">⌫</button></div>
+<div class="tb"><button class="btn" id="bClr" title="Очистить" aria-label="Очистить" data-i18n-title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста" aria-label="Режим специалиста" data-i18n-title="Режим специалиста">⚙</button></div></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="Назад">Назад</span></button><button class="btn" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-i18n="Категории">Категории</span></button><div id="title"></div><button class="btn yes" id="bYes" data-i18n="Да">Да</button><button class="btn no" id="bNo" data-i18n="Нет">Нет</button><span id="specInfo"></span></div>
+<div id="choice"><b data-i18n="Поле выбора">Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
 <input type="file" id="file" accept="image/*" capture="environment" style="display:none">
-<script src="data.js"></script><script src="app.js"></script>
+<script src="data.js"></script><script src="i18n.js"></script><script src="app.js"></script>
 <script>document.addEventListener('contextmenu',e=>{if(e.target.closest('img,.card,.sc'))e.preventDefault()});document.addEventListener('dragstart',e=>{if(e.target.tagName==='IMG')e.preventDefault()});</script>
 <script>(function(){var t=document.querySelector('#hdr .menu-toggle'),n=document.getElementById('site-nav');if(t&&n)t.onclick=function(){var o=n.classList.toggle('open');t.setAttribute('aria-expanded',o)}})();</script>
 </body></html>

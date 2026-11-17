@@ -34,11 +34,13 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 .grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px}.card{font-size:15px;min-height:0;border-width:4px}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.g-s .grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}#title{font-size:17px}.btn{font-size:16px;min-height:46px}}
 @media (orientation:landscape) and (max-height:500px){#strip{min-height:70px}.sc img{height:40px}}
 #home-aymaba{display:flex;align-items:center;gap:6px;background:#fff;border-radius:12px;padding:6px 10px;min-height:52px;color:#1f7a6d;font-weight:800;font-size:17px;text-decoration:none}#home-aymaba img{width:32px;height:32px}@media (max-width:600px){#home-aymaba{min-height:46px;font-size:15px}}
+#hdr{position:relative;z-index:25;background:#1f7a6d;display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:52px}#hdr a{display:flex;align-items:center;gap:8px;color:#fff;font-weight:800;font-size:19px;text-decoration:none;padding:4px 6px;border-radius:10px}#hdr a img{width:36px;height:36px;background:#fff;border-radius:8px;padding:2px}#hdr .sub{color:#d7efe9;font-size:15px}@media (max-width:600px){#hdr{min-height:46px}#hdr a{font-size:17px}#hdr a img{width:30px;height:30px}#hdr .sub{font-size:13px}}
 </style></head><body>
+<header id="hdr"><a href="/aymaba/" title="На главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA <span class="sub">← на главную</span></a></header>
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
 <div class="tb"><button class="btn big" id="bSpeak" title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю">⌫</button></div>
 <div class="tb"><button class="btn" id="bClr" title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста">⚙</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><a id="home-aymaba" href="/aymaba/" title="На главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA</a><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
 <div id="choice"><b>Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>

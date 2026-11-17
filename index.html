@@ -38,11 +38,17 @@ table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
 <div class="tb"><button class="btn big" id="bSpeak" title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю">⌫</button></div>
 <div class="tb"><button class="btn" id="bClr" title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста">⚙</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><a id="home-aymaba" href="/aymaba/" title="На главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA</a><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><a id="home-aymaba" href="/aymaba/" title="Удерживайте, чтобы выйти на главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA</a><button class="btn" id="bBack">← Назад</button><button class="btn" id="bHome">⌂ Категории</button><div id="title"></div><button class="btn yes" id="bYes">Да</button><button class="btn no" id="bNo">Нет</button><span id="specInfo"></span></div>
 <div id="choice"><b>Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
 <input type="file" id="file" accept="image/*" capture="environment" style="display:none">
 <script src="data.js"></script><script src="app.js"></script>
+<script>(function(){var a=document.getElementById('home-aymaba'),t,go=false;
+function down(e){go=false;a.style.opacity='.6';t=setTimeout(function(){go=true;location.href=a.href},800)}
+function up(){clearTimeout(t);a.style.opacity='';}
+a.addEventListener('click',function(e){if(!go){e.preventDefault();var o=a.title;a.title='Удерживайте, чтобы выйти на главную';var s=document.getElementById('specInfo');if(s){var p=s.textContent;s.textContent='Удерживайте AYMABA, чтобы выйти на главную';setTimeout(function(){s.textContent=p},2000)}}});
+a.addEventListener('pointerdown',down);['pointerup','pointerleave','pointercancel'].forEach(function(n){a.addEventListener(n,up)});
+a.addEventListener('contextmenu',function(e){e.preventDefault()});})();</script>
 </body></html>

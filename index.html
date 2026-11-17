@@ -1,43 +1,73 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#2b6cb0"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f7a6d"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.svg"><link rel="icon" href="icon.svg">
 <title>AYMABA — коммуникатор пиктограмм</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f1f5f9;user-select:none;-webkit-user-select:none}
-#top{position:sticky;top:0;z-index:5;background:#2b6cb0;padding:8px;display:flex;gap:8px;align-items:stretch}
-#strip{flex:1;min-height:120px;background:#fff;border-radius:14px;display:flex;gap:6px;padding:6px;overflow-x:auto;align-items:center;cursor:pointer}
-#strip:empty::before{content:"Нажмите на карточку";color:#94a3b8;font-size:20px;padding-left:10px}
-.sc{flex:0 0 auto;width:100px;text-align:center;font-size:14px;border:4px solid #cbd5e1;border-radius:10px;background:#fff;padding:2px}
-.sc img{width:100%;height:72px;object-fit:contain}.sc.starter{background:#fef9c3;display:flex;align-items:center;justify-content:center;height:104px;font-size:20px;font-weight:bold}
-.tb{display:flex;flex-direction:column;gap:6px}.btn{border:0;border-radius:12px;font-size:18px;padding:10px 14px;background:#fff;cursor:pointer;min-width:64px;min-height:52px}
-.btn.big{font-size:28px}.btn.pri{background:#facc15}
-#bar{display:flex;gap:8px;padding:8px;align-items:center;flex-wrap:wrap}#title{font-size:22px;font-weight:bold;flex:1}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:12px}
-.card{background:#fff;border-radius:16px;border:5px solid #e2e8f0;padding:6px;text-align:center;cursor:pointer;position:relative;font-size:18px;min-height:150px;display:flex;flex-direction:column}
+:root{--green:#1f7a6d;--green-dark:#165c52;--green-soft:#e3f2ee;--sand:#fbf6ee;--bg:#f7f3ec;--peach:#f6c177;--coral:#e46f45;--ink:#1f2a2e;--ink2:#1a1612;--muted:#5b6b70;--line:#e6ddd0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);user-select:none;-webkit-user-select:none}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+/* полоска и шапка AYMABA */
+.powered{display:flex;min-height:32px;align-items:center;justify-content:center;background:var(--ink2);color:#faf7f1;font-size:13px;font-weight:500;letter-spacing:.03em;text-decoration:none}
+#hdr{position:relative;z-index:25;background:rgba(251,246,238,.98);border-bottom:1px solid var(--line)}
+#hdr .bar{display:flex;align-items:center;gap:12px;min-height:60px;padding:0 16px;max-width:1500px;margin:0 auto;flex-wrap:wrap}
+#hdr a.brand{display:flex;align-items:center;gap:10px;min-height:48px;color:var(--ink);font-weight:800;font-size:21px;letter-spacing:.04em;text-decoration:none;padding:4px 10px 4px 2px;border-radius:12px;margin-right:auto}
+#hdr a.brand:hover{background:var(--green-soft)}
+#hdr a.brand img{width:36px;height:36px;display:block}
+#hdr .sub{font-size:14px;font-weight:700;letter-spacing:0;color:var(--green-dark);background:var(--green-soft);border-radius:999px;padding:4px 10px}
+#hdr .nav{display:flex;gap:4px;flex-wrap:wrap}
+#hdr .nav a{padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:15px}
+#hdr .nav a:hover,#hdr .nav a[aria-current="page"]{background:var(--green-soft);color:var(--green-dark)}
+#hdr .menu-toggle{display:none;font:inherit;font-size:15px;font-weight:600;padding:9px 12px;min-height:44px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;color:var(--ink)}
+@media (max-width:1080px){#hdr .menu-toggle{display:inline-flex;gap:6px;align-items:center}#hdr .nav{display:none;width:100%;flex-direction:column;padding-bottom:10px}#hdr .nav.open{display:flex}#hdr .nav a{padding:14px 12px;border-bottom:1px solid var(--line);border-radius:0}}
+/* фразовая полоса */
+#top{position:sticky;top:0;z-index:5;background:var(--green);padding:10px;display:flex;gap:10px;align-items:stretch;box-shadow:0 6px 20px rgba(60,45,20,.12)}
+#strip{flex:1;min-height:120px;background:#fff;border-radius:18px;display:flex;gap:8px;padding:8px;overflow-x:auto;align-items:center;cursor:pointer;box-shadow:inset 0 0 0 2px #cfe7df}
+#strip:empty::before{content:"Нажмите на карточку";color:#9aa8ab;font-size:20px;font-weight:600;padding-left:10px}
+.sc{flex:0 0 auto;width:100px;text-align:center;font-size:14px;font-weight:600;border:4px solid #cfe7df;border-radius:14px;background:#fff;padding:2px}
+.sc img{width:100%;height:72px;object-fit:contain}.sc.starter{background:#fde6c4;border-color:var(--peach);display:flex;align-items:center;justify-content:center;height:104px;font-size:20px;font-weight:bold}
+.tb{display:flex;flex-direction:column;gap:8px}
+.btn{font-family:inherit;font-weight:700;color:var(--ink);border:1.5px solid var(--line);border-radius:14px;font-size:18px;padding:10px 14px;background:#fff;cursor:pointer;min-width:64px;min-height:52px}
+.btn:active{transform:scale(.96)}
+#top .btn{border:0;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.btn.big{font-size:30px}.btn.pri{background:var(--peach);border-color:var(--peach);color:var(--ink2)}
+#bSpeak{background:var(--peach)}
+#bar{display:flex;gap:8px;padding:12px 12px 4px;align-items:center;flex-wrap:wrap;max-width:1500px;margin:0 auto}
+#title{font-size:24px;font-weight:800;flex:1;color:var(--ink)}
+#bBack,#bHome{border-color:var(--green);color:var(--green-dark)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:12px;max-width:1500px;margin:0 auto}
+.card{background:#fff;border-radius:18px;border:5px solid #cfe7df;padding:8px;text-align:center;cursor:pointer;position:relative;font-size:18px;min-height:150px;display:flex;flex-direction:column;box-shadow:0 4px 14px rgba(60,45,20,.07)}
 .card img{width:100%;aspect-ratio:1;object-fit:contain}.card:active{transform:scale(.96)}
-.card .lbl{font-weight:600;margin-top:4px;word-break:break-word}.card.hidden{opacity:.35}
-.cat{background:#2b6cb0;color:#fff;border-color:#2b6cb0}.cat img{background:#fff;border-radius:10px}
-.edit{position:absolute;top:4px;right:4px;display:flex;flex-direction:column;gap:4px}.edit button{font-size:16px;border:0;border-radius:8px;padding:6px 9px;background:#e2e8f0}
+.card .lbl{font-weight:700;margin-top:4px;word-break:break-word}.card.hidden{opacity:.35}
+.cat{background:var(--green);color:#fff;border-color:var(--green)}.cat img{background:#fff;border-radius:12px}
+.edit{position:absolute;top:4px;right:4px;display:flex;flex-direction:column;gap:4px}.edit button{font-size:16px;border:1px solid var(--line);border-radius:10px;padding:6px 9px;background:#fff}
 .phase1 .grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}.phase1 .card{font-size:28px}
-#choice{display:none;padding:12px}#choice .grid{background:#fff;border:3px dashed #2b6cb0;border-radius:16px;min-height:220px}
-.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:20}.modal.on{display:flex}
-.box{background:#fff;border-radius:16px;padding:18px;max-width:640px;width:94%;max-height:90vh;overflow:auto;font-size:18px}
-.box input,.box select{font-size:20px;padding:8px;width:100%;margin:4px 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap}
-table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left}
-#big{position:fixed;inset:0;background:#fffe;display:none;align-items:center;justify-content:center;z-index:15;flex-direction:column;font-size:48px;font-weight:bold}#big img{max-width:70vmin;max-height:60vh}
+#choice{display:none;padding:12px;max-width:1500px;margin:0 auto}#choice .grid{background:#fff;border:3px dashed var(--green);border-radius:18px;min-height:220px}
+.modal{position:fixed;inset:0;background:rgba(26,22,18,.5);display:none;align-items:center;justify-content:center;z-index:20}.modal.on{display:flex}
+.box{background:#fff;border-radius:20px;padding:20px;max-width:640px;width:94%;max-height:90vh;overflow:auto;font-size:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.box h3,.box h4{margin:4px 0 10px}
+.box input,.box select{font:inherit;font-size:19px;padding:9px 12px;width:100%;margin:4px 0 10px;border:1.5px solid var(--line);border-radius:12px;background:#fff;min-height:46px}
+.box input:focus,.box select:focus{border-color:var(--green);outline:none}
+.box .pinK{background:var(--sand)}.box .pinK[data-k="OK"]{background:var(--green);border-color:var(--green);color:#fff}
+.box hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid var(--line);padding:4px;text-align:left}
+#big{position:fixed;inset:0;background:rgba(251,246,238,.97);display:none;align-items:center;justify-content:center;z-index:15;flex-direction:column;font-size:48px;font-weight:bold}#big img{max-width:70vmin;max-height:60vh}
 .fz-people{border-color:#facc15}.fz-action{border-color:#22c55e}.fz-desc{border-color:#3b82f6}.fz-noun{border-color:#f97316}.fz-social{border-color:#ec4899}.fz-place{border-color:#a855f7}.fz-misc{border-color:#94a3b8}
-#quick{display:flex;gap:6px;padding:6px 8px;overflow-x:auto;background:#e2e8f0}#quick .q{flex:0 0 auto;width:88px;font-size:14px;min-height:0;padding:3px;border-width:3px}#quick .q img{height:52px}
-.yes{background:#22c55e;color:#fff}.no{background:#ef4444;color:#fff}#starters{display:none;gap:6px;padding:6px 8px}
+#quick{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;background:var(--green-soft);border-bottom:1px solid #cfe7df}#quick .q{flex:0 0 auto;width:88px;font-size:14px;min-height:0;padding:3px;border-width:3px;border-radius:14px}#quick .q img{height:52px}
+.yes{background:#22c55e!important;border-color:#22c55e!important;color:#fff!important}.no{background:#ef4444!important;border-color:#ef4444!important;color:#fff!important}#starters{display:none;gap:6px;padding:8px 10px;flex-wrap:wrap}
 .g-s .grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}.g-l .card{font-size:24px}
-@media (max-width:600px){#top{flex-wrap:wrap}#strip{min-height:86px;flex-basis:100%}.tb{flex-direction:row;flex:1}.tb .btn{flex:1}.sc{width:72px;font-size:12px}.sc img{height:50px}.sc.starter{height:78px;font-size:15px}
-.grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:8px}.card{font-size:15px;min-height:0;border-width:4px}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.g-s .grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}#title{font-size:17px}.btn{font-size:16px;min-height:46px}}
-@media (orientation:landscape) and (max-height:500px){#strip{min-height:70px}.sc img{height:40px}}
-#home-aymaba{display:flex;align-items:center;gap:6px;background:#fff;border-radius:12px;padding:6px 10px;min-height:52px;color:#1f7a6d;font-weight:800;font-size:17px;text-decoration:none}#home-aymaba img{width:32px;height:32px}@media (max-width:600px){#home-aymaba{min-height:46px;font-size:15px}}
-#hdr{position:relative;z-index:25;background:#1f7a6d;display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:52px}#hdr a{display:flex;align-items:center;gap:8px;color:#fff;font-weight:800;font-size:19px;text-decoration:none;padding:4px 6px;border-radius:10px}#hdr a img{width:36px;height:36px;background:#fff;border-radius:8px;padding:2px}#hdr .sub{color:#d7efe9;font-size:15px}@media (max-width:600px){#hdr{min-height:46px}#hdr a{font-size:17px}#hdr a img{width:30px;height:30px}#hdr .sub{font-size:13px}}
+@media (max-width:600px){.powered{min-height:26px;font-size:12px}#hdr .bar{min-height:54px;padding:0 10px;gap:8px}#hdr a.brand{font-size:18px;gap:8px}#hdr a.brand img{width:32px;height:32px}#hdr .sub{font-size:12px;padding:3px 8px}#hdr .menu-label{display:none}
+#top{flex-wrap:wrap;padding:8px;gap:8px}#strip{min-height:86px;flex-basis:100%}.tb{flex-direction:row;flex:1}.tb .btn{flex:1}.sc{width:72px;font-size:12px}.sc img{height:50px}.sc.starter{height:78px;font-size:15px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;padding:10px}.card{font-size:15px;min-height:0;border-width:4px;border-radius:16px;padding:6px}.g-l .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.g-s .grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}#title{font-size:18px}.btn{font-size:16px;min-height:48px}}
+@media (orientation:landscape) and (max-height:500px){#strip{min-height:70px}.sc img{height:40px}.powered{display:none}}
 img{-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;pointer-events:auto}
 </style></head><body>
-<header id="hdr"><a href="/aymaba/" title="На главную AYMABA"><img src="aymaba-logo.svg" alt="">AYMABA <span class="sub">← на главную</span></a></header>
+<a class="powered" href="https://wa.me/77782577877" target="_blank" rel="noopener noreferrer">powered by vivamusz</a>
+<header id="hdr"><div class="bar"><a class="brand" href="https://vivamusz.github.io/aymaba/" title="На главную AYMABA" aria-label="AYMABA — на главную"><img src="aymaba-logo.svg" alt="" width="36" height="36">AYMABA <span class="sub">← на главную</span></a>
+<button type="button" class="menu-toggle" aria-label="Меню" aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> <span class="menu-label">Меню</span></button>
+<nav id="site-nav" class="nav" aria-label="Меню"><a href="https://vivamusz.github.io/aba-constructor/">Конструктор</a><a href="https://vivamusz.github.io/pecs-aac/" aria-current="page">Коммуникатор</a><a href="https://vivamusz.github.io/aymaba/library.html">Библиотека карточек</a><a href="https://vivamusz.github.io/aymaba/#sets">Наборы для печати</a><a href="https://vivamusz.github.io/aymaba/#pricing">Тарифы</a></nav></div></header>
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести"></div>
 <div class="tb"><button class="btn big" id="bSpeak" title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю">⌫</button></div>
 <div class="tb"><button class="btn" id="bClr" title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста">⚙</button></div></div>
@@ -49,4 +79,5 @@ img{-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;pointer-eve
 <input type="file" id="file" accept="image/*" capture="environment" style="display:none">
 <script src="data.js"></script><script src="app.js"></script>
 <script>document.addEventListener('contextmenu',e=>{if(e.target.closest('img,.card,.sc'))e.preventDefault()});document.addEventListener('dragstart',e=>{if(e.target.tagName==='IMG')e.preventDefault()});</script>
+<script>(function(){var t=document.querySelector('#hdr .menu-toggle'),n=document.getElementById('site-nav');if(t&&n)t.onclick=function(){var o=n.classList.toggle('open');t.setAttribute('aria-expanded',o)}})();</script>
 </body></html>

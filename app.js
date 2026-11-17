@@ -27,10 +27,10 @@ function pinPad(title,mode){return new Promise(resolve=>{
       if(buf.length<4||buf.length>8){err.textContent=L('Нужно 4–8 цифр');return}
       if(mode==='setup'){
         if(!first){first=buf;buf='';disp.textContent=L('ещё раз');err.textContent=L('Повторите PIN');return}
-        if(buf!==first){err.textContent=L('Не совпало, сначала заново');first='';buf='';show();return}
+        if(buf!==first){first='';buf='';show();err.textContent=L('Не совпало, сначала заново');return}
         await setPin(buf);closeM();resolve(true);return
       }
-      if(await checkPin(buf)){closeM();resolve(true)}else{err.textContent=L('Неверный PIN');buf='';show()}
+      if(await checkPin(buf)){closeM();resolve(true)}else{buf='';show();err.textContent=L('Неверный PIN')}
       return
     }
     if(buf.length>=8)return;buf+=k;show()
@@ -152,7 +152,7 @@ $('bDel').onclick=()=>{strip.pop();drawStrip()};$('bClr').onclick=()=>{strip=[];
 $('bHome').onclick=()=>{cur=null;hist=[];render()};$('bBack').onclick=()=>{cur=hist.length?hist.pop():null;render()};
 $('bYes').onclick=()=>{say(L('Да'));logPhrase(L('Да'))};$('bNo').onclick=()=>{say(L('Нет'));logPhrase(L('Нет'))};
 let holdT=null,holdDone=false;
-$('bSpec').onpointerdown=e=>{if(spec)return;holdDone=false;holdT=setTimeout(async()=>{holdDone=true;if(!(await askPin()))return;spec=true;setZoom(true);askPersist();render();settings()},3000)};
+$('bSpec').onpointerdown=e=>{holdDone=false;if(spec)return;holdT=setTimeout(async()=>{holdDone=true;if(!(await askPin()))return;spec=true;setZoom(true);askPersist();render();settings()},3000)};
 $('bSpec').onpointerup=$('bSpec').onpointerleave=$('bSpec').onpointercancel=()=>{clearTimeout(holdT);holdT=null};
 $('bSpec').onclick=()=>{if(holdDone){holdDone=false;return}if(spec){spec=false;setZoom(false);render()}};
 document.querySelectorAll('#langSw [data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));

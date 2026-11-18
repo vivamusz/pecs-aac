@@ -77,9 +77,60 @@ function tapCard(c){S.recent=[c.id].concat(S.recent.filter(x=>x!==c.id)).slice(0
  if(S.phase<=2||S.phase===3){showBig(c);say(word(c));logPhrase(word(c));return}
  strip.push(c.id);drawStrip();if(S.speakTap)say(word(c))}
 function showBig(c){const b=$('big');b.innerHTML='<img src="'+c.img+'"><div>'+esc(word(c))+'</div>';b.style.display='flex';b.onclick=()=>b.style.display='none';setTimeout(()=>b.style.display='none',4000)}
-function phrase(){const w=strip.map(id=>card(id)).filter(Boolean).map(word);if(S.phase>=4&&S.useStarter&&strip.length)w.unshift(L(S.starter));return w.join(' ')}
-function drawStrip(){const s=$('strip');s.innerHTML='';if(S.phase>=4&&S.useStarter&&strip.length)s.appendChild(el('div','sc starter',esc(L(S.starter))));
- strip.forEach(id=>{const c=card(id);if(!c)return;const e=el('div','sc '+fz(c),'<img src="'+c.img+'"><div>'+esc(word(c))+'</div>');s.appendChild(e)});s.scrollLeft=1e5}
+/* Optional per-card Kazakh forms, filled later from the user's table, never invented:
+   card.kkWant or card.kkForms={acc,dat,loc,abl,ins,poss1,pl,want,pres,neg}
+   Only kkWant / kkForms.want is used in phrases today. */
+function stripKey(){const p=[];if(S.phase>=4&&S.useStarter&&strip.length)p.push('start:'+S.starter);return p.concat(strip).join('+')}
+function kkWantOf(c){return (c&&(c.kkWant||(c.kkForms&&c.kkForms.want)))||''}
+function phraseParts(){
+  const cards=strip.map(id=>card(id)).filter(Boolean);
+  const use=S.phase>=4&&S.useStarter&&cards.length;
+  if(KK()&&use&&S.starter==='Я хочу'){
+    const split=I18.kkStarterSplit&&I18.kkStarterSplit['Я хочу'];
+    if(split){
+      const wantIdx=[...cards].map((c,i)=>kkWantOf(c)?i:-1).filter(i=>i>=0).pop();
+      const mid=wantIdx==null?cards:cards.filter((_,i)=>i!==wantIdx);
+      const parts=[{kind:'text',text:split.pre}];
+      mid.forEach(c=>parts.push({kind:'card',card:c,text:word(c)}));
+      if(wantIdx!=null){const w=cards[wantIdx];parts.push({kind:'card',card:w,text:kkWantOf(w)})}
+      else parts.push({kind:'text',text:split.post});
+      return parts;
+    }
+  }
+  const parts=[];
+  if(use)parts.push({kind:'text',text:L(S.starter)});
+  cards.forEach(c=>parts.push({kind:'card',card:c,text:word(c)}));
+  return parts;
+}
+function phrase(){
+  if(KK()&&S.phase>=4&&S.useStarter&&strip.length){const fix=(I18.kkFix||{})[stripKey()];if(fix)return fix}
+  return phraseParts().map(p=>p.text).filter(Boolean).join(' ');
+}
+function drawStrip(){
+  const s=$('strip');s.innerHTML='';
+  const fix=KK()&&S.phase>=4&&S.useStarter&&strip.length&&(I18.kkFix||{})[stripKey()];
+  if(fix){
+    s.appendChild(el('div','sc starter sc-fix',esc(fix)));
+    strip.forEach(id=>{const c=card(id);if(!c)return;s.appendChild(el('div','sc '+fz(c),'<img src="'+c.img+'"><div>'+esc(word(c))+'</div>'))});
+  }else{
+    phraseParts().forEach(p=>{
+      if(p.kind==='text')s.appendChild(el('div','sc starter',esc(p.text)));
+      else s.appendChild(el('div','sc '+fz(p.card),'<img src="'+p.card.img+'"><div>'+esc(p.text)+'</div>'));
+    });
+  }
+  s.scrollLeft=1e5;updateFixBtn();
+}
+function updateFixBtn(){const w=$('fixWrap');if(w)w.style.display=(spec&&S.phase>=4&&strip.length)?'flex':'none'}
+function ruStripNames(){const n=[];if(S.phase>=4&&S.useStarter&&strip.length)n.push(S.starter);strip.forEach(id=>{const c=card(id);if(c)n.push(c.word)});return n}
+function reportPhrase(){
+  if(!strip.length)return;
+  const key=stripKey(),rus=ruStripNames(),now=phrase();
+  const copy='Карточки: '+rus.join(' + ')+' | Сейчас: '+now+' | Ключ: '+key+' | Надо: ';
+  modal('<h3>Ошибка во фразе</h3><p><b>Карточки:</b> '+esc(rus.join(' + '))+'</p><p><b>Сейчас:</b> '+esc(now)+'</p><p style="word-break:break-all"><b>Ключ:</b> '+esc(key)+'</p><p style="font-size:14px;color:#64748b">Скопируйте текст и после «Надо:» допишите правильную фразу.</p><div class="row"><button class="btn pri" id="bFixCopy">Копировать</button><button class="btn" onclick="closeM()">'+L('Закрыть')+'</button></div>');
+  $('bFixCopy').onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(copy);ok=true}catch(e){}
+    if(!ok){try{const t=document.createElement('textarea');t.value=copy;t.style.position='fixed';t.style.left='-9999px';document.body.appendChild(t);t.select();ok=document.execCommand('copy');t.remove()}catch(e){}}
+    $('bFixCopy').textContent=ok?'Скопировано':'Не удалось скопировать'};
+}
 function speakStrip(){const p=phrase();if(!p)return;say(p);logPhrase(p)}
 // render
 function render(){applyStatic();document.body.className='g-'+S.size+(S.phase<=2?' phase1':'')+(spec?' spec':'');
@@ -147,7 +198,7 @@ function settings(){const vs=voices.filter(v=>/^(ru|kk)/i.test(v.lang));
  $('sImp').onclick=()=>{const f=document.createElement('input');f.type='file';f.accept='.json,application/json';f.onchange=()=>{const r=new FileReader();r.onload=async()=>{try{const o=JSON.parse(r.result);S=Object.assign({},DEF,o.settings);delete S.pin;save();for(const c of o.custom||[])await idbPut(c);custom=o.custom||[];closeM();render();alert(L('Импортировано'))}catch(e){alert(L('Ошибка файла'))}};r.readAsText(f.files[0])};f.click()};
  $('sRst').onclick=()=>{if(confirm(L('Сбросить все настройки (журнал и свои карточки сохранятся)?'))){S=Object.assign({},DEF,{log:S.log});delete S.pin;save();closeM();render()}}}
 // buttons
-$('strip').onclick=speakStrip;$('bSpeak').onclick=speakStrip;
+$('strip').onclick=speakStrip;$('bSpeak').onclick=speakStrip;$('bFix').onclick=reportPhrase;
 $('bDel').onclick=()=>{strip.pop();drawStrip()};$('bClr').onclick=()=>{strip=[];drawStrip()};
 $('bHome').onclick=()=>{cur=null;hist=[];render()};$('bBack').onclick=()=>{cur=hist.length?hist.pop():null;render()};
 $('bYes').onclick=()=>{say(L('Да'));logPhrase(L('Да'))};$('bNo').onclick=()=>{say(L('Нет'));logPhrase(L('Нет'))};
@@ -157,6 +208,6 @@ $('bSpec').onpointerup=$('bSpec').onpointerleave=$('bSpec').onpointercancel=()=>
 $('bSpec').onclick=()=>{if(holdDone){holdDone=false;return}if(spec){spec=false;setZoom(false);render()}};
 document.querySelectorAll('#langSw [data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 $('specInfo').onclick=()=>spec&&settings();
-window.closeM=closeM;window.say=say;window.__pecs={csv,get S(){return S},strip:()=>phrase()};
+window.closeM=closeM;window.say=say;window.__pecs={csv,get S(){return S},strip:()=>phrase(),key:()=>stripKey(),setSpec(v){spec=!!v;render()},setStrip(ids){strip=(ids||[]).slice();drawStrip()},refresh(){save();render()}};
 (async()=>{await idb();custom=await idbAll();askPersist();render()})();
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});

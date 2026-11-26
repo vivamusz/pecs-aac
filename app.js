@@ -77,30 +77,73 @@ function tapCard(c){S.recent=[c.id].concat(S.recent.filter(x=>x!==c.id)).slice(0
  if(S.phase<=2||S.phase===3){showBig(c);say(word(c));logPhrase(word(c));return}
  strip.push(c.id);drawStrip();if(S.speakTap)say(word(c))}
 function showBig(c){const b=$('big');b.innerHTML='<img src="'+c.img+'"><div>'+esc(word(c))+'</div>';b.style.display='flex';b.onclick=()=>b.style.display='none';setTimeout(()=>b.style.display='none',4000)}
-/* Optional per-card Kazakh forms, filled later from the user's table, never invented:
-   card.kkWant or card.kkForms={acc,dat,loc,abl,ins,poss1,pl,want,pres,neg}
-   Only kkWant / kkForms.want is used in phrases today. */
 function stripKey(){const p=[];if(S.phase>=4&&S.useStarter&&strip.length)p.push('start:'+S.starter);return p.concat(strip).join('+')}
-function kkWantOf(c){return (c&&(c.kkWant||(c.kkForms&&c.kkForms.want)))||''}
-function phraseParts(){
-  const cards=strip.map(id=>card(id)).filter(Boolean);
-  const use=S.phase>=4&&S.useStarter&&cards.length;
-  if(KK()&&use&&S.starter==='Я хочу'){
-    const split=I18.kkStarterSplit&&I18.kkStarterSplit['Я хочу'];
-    if(split){
-      const wantIdx=[...cards].map((c,i)=>kkWantOf(c)?i:-1).filter(i=>i>=0).pop();
-      const mid=wantIdx==null?cards:cards.filter((_,i)=>i!==wantIdx);
-      const parts=[{kind:'text',text:split.pre}];
-      mid.forEach(c=>parts.push({kind:'card',card:c,text:word(c)}));
-      if(wantIdx!=null){const w=cards[wantIdx];parts.push({kind:'card',card:w,text:kkWantOf(w)})}
-      else parts.push({kind:'text',text:split.post});
-      return parts;
-    }
+
+function cardPart(c, text=word(c)){return {kind:'card',card:c,text}}
+function textPart(text){return {kind:'text',text}}
+function kkForms(c){
+  if(word(c)!==c.kk)return {};
+  const reviewed=I18.kkCardForms?.[c.id];
+  return reviewed?.base===c.kk ? reviewed : {...c.kkForms, want:c.kkWant||c.kkForms?.want};
+}
+function kkLabel(c){
+  if(word(c)!==c.kk)return word(c);
+  if(c.id==='c01_038' && c.kk==='көмектес')return 'Көмектесші';
+  return word(c).replace(/^./u, letter=>letter.toLocaleUpperCase('kk'));
+}
+const kkIntents={
+  c01_027:['қаламаймын','refuse'], c08_082:['қаламаймын','refuse'],
+  c01_061:['қалаймын','want'], c01_066:['Мен ... Қалаймын','want'],
+  c01_056:['менде бар','have'], c01_064:['Мен ... көріп тұрмын','see'],
+  c01_065:['Мен ... естіп тұрмын','hear']
+};
+function intention(c){
+  const entry=kkIntents[c.id];
+  return entry && word(c)===entry[0] ? entry[1] : '';
+}
+function kazakhParts(cards){
+  const raw=()=>cards.map(c=>cardPart(c));
+  const marked=cards.filter(intention);
+  if(marked.length>1)return raw();
+  const marker=marked[0];
+  const content=cards.filter(c=>c!==marker);
+  if(!content.length){
+    const labels={want:'Мен қалаймын',refuse:'Қаламаймын',see:'Мен көріп тұрмын',hear:'Мен естіп тұрмын',have:'Менде бар'};
+    return [cardPart(marker,labels[intention(marker)])];
   }
-  const parts=[];
-  if(use)parts.push({kind:'text',text:L(S.starter)});
-  cards.forEach(c=>parts.push({kind:'card',card:c,text:word(c)}));
-  return parts;
+  const kind=marker?intention(marker):({'Я хочу':'want','Я вижу':'see','Я слышу':'hear','У меня есть':'have'})[S.starter];
+  const prefix=text=>marker?[cardPart(marker,text)]:[textPart(text)];
+  if(content.length===1 && !marker && !kkForms(content[0]).acc && !kkForms(content[0]).want){
+    return [cardPart(content[0],kkLabel(content[0]))];
+  }
+  const verbs=content.filter(c=>kkForms(c).kind==='verb'||kkForms(c).want);
+  if((kind==='want'||kind==='refuse') && verbs.length===1){
+    const verb=verbs[0], form=kkForms(verb)[kind==='refuse'?'notWant':'want'];
+    if(!form || content.some(c=>c!==verb && !kkForms(c).acc && catOf(c.cat)?.name==='Коммуникация'))return raw();
+    return [...prefix('Мен'),...content.filter(c=>c!==verb).map(c=>cardPart(c)),cardPart(verb,form)];
+  }
+  if(verbs.length)return raw();
+  const noun=content[content.length-1], forms=kkForms(noun);
+  if(!forms.acc)return raw();
+  // Combine modifiers with a reviewed noun. Separate requests and arbitrary sequences keep their captions.
+  if(content.slice(0,-1).some(c=>!['Цвета','Формы','Размер и количество','Признаки и качества'].includes(catOf(c.cat)?.name)))return raw();
+  const modifiers=content.slice(0,-1).map(c=>cardPart(c));
+  if(kind==='have'){
+    if(!forms.have)return raw();
+    const match=/^(Менде|Менің) (.+) бар$/u.exec(forms.have);
+    if(!match)return content.length===1 ? [cardPart(noun,forms.have)] : raw();
+    return [...prefix(match[1]),...modifiers,cardPart(noun,match[2]),textPart('бар')];
+  }
+  const ending={want:'қалаймын',refuse:'қаламаймын',see:'көріп тұрмын',hear:'естіп тұрмын'}[kind];
+  if(!ending)return raw();
+  const object=kind==='hear' && ['c40_009','c40_011'].includes(noun.id) && forms.base==='мысық'?'мысықтың дауысын':forms.acc;
+  return [...prefix('Мен'),...modifiers,cardPart(noun,object),textPart(ending)];
+}
+function phraseParts(){
+  const cards=strip.map(card).filter(Boolean);
+  const use=S.phase>=4 && S.useStarter && cards.length;
+  if(KK() && use)return kazakhParts(cards);
+  return [...(use?[textPart(L(S.starter))]:[]),...cards.map(c=>cardPart(c))];
 }
 function phrase(){
   if(KK()&&S.phase>=4&&S.useStarter&&strip.length){const fix=(I18.kkFix||{})[stripKey()];if(fix)return fix}

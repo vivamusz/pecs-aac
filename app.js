@@ -120,7 +120,10 @@ function kazakhParts(cards){
   if((kind==='want'||kind==='refuse') && verbs.length===1){
     const verb=verbs[0], form=kkForms(verb)[kind==='refuse'?'notWant':'want'];
     if(!form || content.some(c=>c!==verb && !kkForms(c).acc && catOf(c.cat)?.name==='Коммуникация'))return raw();
-    return [...prefix('Мен'),...content.filter(c=>c!==verb).map(c=>cardPart(c)),cardPart(verb,form)];
+    const objects=content.filter(c=>c!==verb);
+    const movement=verb.id==='c08_015' && kkForms(verb).base==='бару';
+    if(movement && objects.some(c=>!kkForms(c).dat))return raw();
+    return [...prefix('Мен'),...objects.map(c=>cardPart(c,movement?kkForms(c).dat:word(c))),cardPart(verb,form)];
   }
   if(verbs.length)return raw();
   const noun=content[content.length-1], forms=kkForms(noun);

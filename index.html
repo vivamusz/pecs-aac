@@ -32,6 +32,7 @@ body{margin:0;font-family:"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,s
 .btn:active{transform:scale(.96)}
 #top .btn{border:0;box-shadow:0 2px 0 rgba(0,0,0,.12)}
 .btn.big{font-size:30px}.btn.pri{background:var(--peach);border-color:var(--peach);color:var(--ink2)}
+#bSpec{touch-action:manipulation;-webkit-touch-callout:none}
 #bSpeak{background:var(--peach)}
 #bar{display:flex;gap:8px;padding:12px 12px 4px;align-items:center;flex-wrap:wrap;max-width:1500px;margin:0 auto}
 #title{font-size:24px;font-weight:800;flex:1;color:var(--ink)}
@@ -111,6 +112,9 @@ body:has(#specInfo:not(:empty)) #bSpec{--ico:url("data:image/svg+xml,%3Csvg xmln
   #bar{padding:6px 12px 2px}#title{font-size:20px}#bar .btn{min-height:44px;padding:6px 12px;font-size:16px}
 }
 
+#bar #bSpec{grid-column:1/-1;justify-self:start;font-size:15px}
+@media(max-width:600px){#bar #bSpec{width:100%}}
+
 /* RU/KZ — как в конструкторе */
 .lang-sw{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;flex:0 0 auto}
 .lang-sw button{font:inherit;font-weight:800;font-size:15px;letter-spacing:.04em;min-height:44px;min-width:50px;padding:6px 12px;border:0;background:transparent;color:var(--muted);cursor:pointer}
@@ -138,8 +142,8 @@ body.spec .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
 <nav id="site-nav" class="nav" aria-label="Меню"><a href="https://vivamusz.github.io/aba-constructor/" data-i18n="Конструктор">Конструктор</a><a href="https://vivamusz.github.io/pecs-aac/" aria-current="page" data-i18n="Коммуникатор">Коммуникатор</a><a href="https://vivamusz.github.io/aymaba/library.html" data-i18n="Библиотека карточек">Библиотека карточек</a><a href="https://vivamusz.github.io/aymaba/#sets" data-i18n="Наборы для печати">Наборы для печати</a><a href="https://vivamusz.github.io/aymaba/#pricing" data-i18n="Тарифы">Тарифы</a></nav></div></header>
 <div id="top"><div id="strip" title="Нажмите, чтобы произнести" data-i18n-title="Нажмите, чтобы произнести" data-empty="Нажмите на карточку"></div>
 <div class="tb"><button class="btn big" id="bSpeak" title="Сказать" aria-label="Сказать" data-i18n-title="Сказать">🔊</button><button class="btn" id="bDel" title="Удалить последнюю" aria-label="Удалить последнюю" data-i18n-title="Удалить последнюю">⌫</button></div>
-<div class="tb"><button class="btn" id="bClr" title="Очистить" aria-label="Очистить" data-i18n-title="Очистить">✖</button><button class="btn" id="bSpec" title="Режим специалиста" aria-label="Режим специалиста" data-i18n-title="Режим специалиста">⚙</button></div><div class="tb" id="fixWrap"><button class="btn" id="bFix" type="button" title="Ошибка во фразе" aria-label="Ошибка во фразе">Ошибка во фразе</button></div></div>
-<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="Назад">Назад</span></button><button class="btn" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-i18n="Категории">Категории</span></button><div id="title"></div><button class="btn yes" id="bYes" data-i18n="Да">Да</button><button class="btn no" id="bNo" data-i18n="Нет">Нет</button><span id="specInfo"></span></div>
+<div class="tb"><button class="btn" id="bClr" title="Очистить" aria-label="Очистить" data-i18n-title="Очистить">✖</button><button class="btn" type="button" id="bSpec" title="Режим специалиста" aria-label="Режим специалиста" data-i18n-title="Режим специалиста">⚙</button></div><div class="tb" id="fixWrap"><button class="btn" id="bFix" type="button" title="Ошибка во фразе" aria-label="Ошибка во фразе">Ошибка во фразе</button></div></div>
+<div id="quick"></div><div id="starters"></div><div id="bar"><button class="btn" id="bBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-i18n="Назад">Назад</span></button><button class="btn" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-i18n="Категории">Категории</span></button><div id="title"></div><button class="btn yes" id="bYes" data-i18n="Да">Да</button><button class="btn no" id="bNo" data-i18n="Нет">Нет</button><button type="button" id="specInfo" hidden></button></div>
 <div id="choice"><b data-i18n="Поле выбора">Поле выбора</b><div class="grid" id="choiceGrid"></div></div>
 <div class="grid" id="grid"></div>
 <div id="big"></div>

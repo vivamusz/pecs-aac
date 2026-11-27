@@ -12,14 +12,28 @@ async function setPin(pin){const salt=crypto.getRandomValues(new Uint8Array(16))
 async function checkPin(pin){const r=pinRec();if(!r)return false;return (await hashPin(pin,r.salt))===r.hash}
 function setZoom(on){const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute('content',on?'width=device-width,initial-scale=1':'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')}
 function askPersist(){try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}}
+let cancelPin=null;
 function pinPad(title,mode){return new Promise(resolve=>{
   const html='<h3>'+title+'</h3><div id="pinDisp" style="font:28px/1.2 monospace;letter-spacing:6px;text-align:center;min-height:36px;margin:8px 0">· · · ·</div><div id="pinErr" style="color:#c00;font-size:14px;min-height:18px;text-align:center"></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto">'+
     [1,2,3,4,5,6,7,8,9,'←',0,'OK'].map(k=>'<button type="button" class="btn pinK" data-k="'+k+'" style="font-size:22px;padding:14px 0">'+(k==='OK'?'✓':k)+'</button>').join('')+
-    '</div><p style="font-size:13px;color:#64748b;text-align:center;margin-top:10px">'+(mode==='setup'?L('4–8 цифр, два раза'):L('Удерживайте ⚙ 3 сек, затем введите PIN'))+'</p><button class="btn" id="pinCancel" style="margin-top:8px;width:100%">'+L('Отмена')+'</button>';
+    '</div><p style="font-size:13px;color:#64748b;text-align:center;margin-top:10px">'+(mode==='setup'?L('4–8 цифр, два раза'):(KK()?'Маманның PIN-кодын енгізіңіз':'Введите PIN специалиста'))+'</p><button class="btn" id="pinCancel" style="margin-top:8px;width:100%">'+L('Отмена')+'</button>';
   modal(html);let buf='',first='';
   const disp=$('pinDisp'),err=$('pinErr');
   const show=()=>{disp.textContent=buf?('•'.repeat(buf.length)):('· · · ·');err.textContent=''};
-  $('pinCancel').onclick=()=>{closeM();resolve(null)};
+  function finish(value){
+    cancelPin=null;document.removeEventListener('keydown',keyInput);
+    closeM();$('bSpec').focus();resolve(value);
+  }
+  function keyInput(event){
+    if(event.ctrlKey||event.metaKey||event.altKey)return;
+    if(event.key==='Escape'){event.preventDefault();finish(null);return}
+    const k=event.key==='Backspace'?'←':event.key;
+    if(!/^(?:[0-9]|←)$/.test(k))return;
+    event.preventDefault();$('mbox').querySelector('.pinK[data-k="'+k+'"]').click();
+  }
+  cancelPin=()=>finish(null);$('pinCancel').onclick=cancelPin;
+  document.addEventListener('keydown',keyInput);
+  $('mbox').querySelector('.pinK[data-k="OK"]').focus();
   $('mbox').querySelectorAll('.pinK').forEach(b=>b.onclick=async()=>{
     const k=b.dataset.k;
     if(k==='←'){buf=buf.slice(0,-1);show();return}
@@ -28,9 +42,9 @@ function pinPad(title,mode){return new Promise(resolve=>{
       if(mode==='setup'){
         if(!first){first=buf;buf='';disp.textContent=L('ещё раз');err.textContent=L('Повторите PIN');return}
         if(buf!==first){first='';buf='';show();err.textContent=L('Не совпало, сначала заново');return}
-        await setPin(buf);closeM();resolve(true);return
+        await setPin(buf);finish(true);return
       }
-      if(await checkPin(buf)){closeM();resolve(true)}else{buf='';show();err.textContent=L('Неверный PIN')}
+      if(await checkPin(buf)){finish(true)}else{buf='';show();err.textContent=L('Неверный PIN')}
       return
     }
     if(buf.length>=8)return;buf+=k;show()
@@ -180,12 +194,18 @@ function reportPhrase(){
 function speakStrip(){const p=phrase();if(!p)return;say(p);logPhrase(p)}
 // render
 function render(){applyStatic();document.body.className='g-'+S.size+(S.phase<=2?' phase1':'')+(spec?' spec':'');
- $('top').style.display=S.phase>=4?'flex':'none';
+ const early=S.phase<4, button=$('bSpec');
+ const host=early?$('bar'):$('bClr').parentElement;
+ if(button.parentElement!==host)host.insertBefore(button,early?$('specInfo'):null);
+ $('top').style.display=early?'none':'flex';
  const st=$('starters');st.style.display=S.phase>=5?'flex':'none';st.innerHTML='';
  ['Я хочу','Я вижу','Я слышу','У меня есть'].forEach(t=>{const b=el('button','btn'+(S.starter===t?' pri':''),esc(L(t)));b.onclick=()=>{S.starter=t;save();render()};st.appendChild(b)});
  drawQuick();drawStrip();
+ $('specInfo').hidden=!spec;
  $('specInfo').textContent=spec?LK('comm.spec.phase',L('🔓 Специалист · фаза {n}')).replace('{n}',['','I','II','III','IV','V','VI'][S.phase]):'';
- $('bSpec').textContent=spec?'🔒':'⚙';
+ const adultLabel=spec?(KK()?'Бала режиміне оралу':'Вернуться в детский режим'):(KK()?'Ересектерге арналған баптаулар':'Настройки для взрослого');
+ button.textContent=early?adultLabel:(spec?'🔒':'⚙');
+ button.title=adultLabel;button.setAttribute('aria-label',adultLabel);
  const g=$('grid');g.innerHTML='';$('choice').style.display='none';
  if(S.phase===3&&!spec){$('choice').style.display='block';$('title').textContent=L('Выбор');const cg=$('choiceGrid');cg.innerHTML='';
   S.choice.map(card).filter(Boolean).forEach(c=>cg.appendChild(cardEl(c,tapCard)));if(!S.choice.length)cg.textContent=L('Специалист: выберите 2–5 карточек (⚙ → карточка → «В поле»).');return}
@@ -204,15 +224,22 @@ function catTile(c,f){const e=el('div','card cat'+(S.hidden[c.id]?' hidden':''),
 function tools(o,list,key){const t=el('div','edit');const mk=(l,f)=>{const b=el('button','',l);b.onclick=e=>{e.stopPropagation();f()};t.appendChild(b)};
  mk(S.hidden[o.id]?'🙈':'👁',()=>{S.hidden[o.id]=!S.hidden[o.id];save();render()});mk('◀',()=>move(list,key,o.id,-1));mk('▶',()=>move(list,key,o.id,1));
  if(key==='_cats')mk('✎',()=>{const n=prompt(L('Название категории'),catName(o));if(n!=null){S.cap[o.id]={ru:n};save();render()}});return t}
+function coreIds(){
+  if(!S.core){
+    const defaults=['да','нет','ещё','еще','стоп','помоги','помогите','всё','дай','хочу','пить','есть','туалет','не хочу'];
+    S.core=[...new Set(defaults.map(w=>D.cards.find(c=>c.word.toLowerCase()===w)?.id).filter(Boolean))];
+    save();
+  }
+  return S.core;
+}
 function drawQuick(){const q=$('quick');q.innerHTML='';if(S.phase<4){q.style.display='none';return}q.style.display='flex';
- let ids=S.core;if(!ids){const want=['да','нет','ещё','еще','стоп','помоги','помогите','всё','дай','хочу','пить','есть','туалет','не хочу'];ids=[];want.forEach(w=>{const c=D.cards.find(c=>c.word.toLowerCase()===w);if(c&&!ids.includes(c.id))ids.push(c.id)});S.core=ids;save()}
- ids.map(card).filter(Boolean).forEach(c=>{const e=el('div','card q '+fz(c),'<img src="'+c.img+'"><div>'+esc(word(c))+'</div>');e.onclick=()=>tapCard(c);q.appendChild(e)})}
+ coreIds().map(card).filter(Boolean).forEach(c=>{const e=el('div','card q '+fz(c),'<img src="'+c.img+'"><div>'+esc(word(c))+'</div>');e.onclick=()=>tapCard(c);q.appendChild(e)})}
 // modals
 function modal(html){$('mbox').innerHTML=html;$('modal').classList.add('on')}
 function closeM(){$('modal').classList.remove('on')}
-$('modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+$('modal').onclick=e=>{if(e.target.id==='modal'){if(cancelPin)cancelPin();else closeM()}};
 function editCard(c){const k=S.cap[c.id]||{};const isC=c.id.startsWith('u_');
- modal('<h3>'+LK('comm.edit.title',L('Карточка: {слово}')).replace(/\{[^}]*\}/,esc(word(c)))+'</h3><img src="'+c.img+'" style="height:120px"><label>'+L('Подпись RU')+'<input id="eRu" value="'+esc(k.ru||'')+'" placeholder="'+esc(c.word)+'"></label><label>'+L('Подпись KZ')+'<input id="eKz" value="'+esc(k.kz||'')+'"></label><div class="row"><button class="btn pri" id="eOk">'+L('Сохранить')+'</button><button class="btn" id="eFav">'+(S.fav.includes(c.id)?L('★ Убрать из избранного'):L('☆ В избранное'))+'</button><button class="btn" id="eCore">'+(S.core.includes(c.id)?L('Убрать из быстрой панели'):L('В быструю панель'))+'</button><button class="btn" id="eCh">'+(S.choice.includes(c.id)?L('Убрать из поля (фаза III)'):L('В поле выбора (фаза III)'))+'</button>'+(isC?'<button class="btn no" id="eDel">'+L('Удалить')+'</button>':'')+'<button class="btn" onclick="closeM()">'+L('Отмена')+'</button></div>');
+ modal('<h3>'+LK('comm.edit.title',L('Карточка: {слово}')).replace(/\{[^}]*\}/,esc(word(c)))+'</h3><img src="'+c.img+'" style="height:120px"><label>'+L('Подпись RU')+'<input id="eRu" value="'+esc(k.ru||'')+'" placeholder="'+esc(c.word)+'"></label><label>'+L('Подпись KZ')+'<input id="eKz" value="'+esc(k.kz||'')+'"></label><div class="row"><button class="btn pri" id="eOk">'+L('Сохранить')+'</button><button class="btn" id="eFav">'+(S.fav.includes(c.id)?L('★ Убрать из избранного'):L('☆ В избранное'))+'</button><button class="btn" id="eCore">'+(coreIds().includes(c.id)?L('Убрать из быстрой панели'):L('В быструю панель'))+'</button><button class="btn" id="eCh">'+(S.choice.includes(c.id)?L('Убрать из поля (фаза III)'):L('В поле выбора (фаза III)'))+'</button>'+(isC?'<button class="btn no" id="eDel">'+L('Удалить')+'</button>':'')+'<button class="btn" onclick="closeM()">'+L('Отмена')+'</button></div>');
  $('eOk').onclick=()=>{S.cap[c.id]={ru:$('eRu').value.trim(),kz:$('eKz').value.trim()};save();closeM();render()};
  const tg=(a,lim)=>{const i=S[a].indexOf(c.id);if(i>=0)S[a].splice(i,1);else{if(lim&&S[a].length>=lim)return alert(LK('comm.alert.max',L('Не больше {n}')).replace('{n}',lim));S[a].push(c.id)}save();closeM();render()};
  $('eFav').onclick=()=>tg('fav');$('eCore').onclick=()=>tg('core');$('eCh').onclick=()=>tg('choice',5);
@@ -248,10 +275,27 @@ $('strip').onclick=speakStrip;$('bSpeak').onclick=speakStrip;$('bFix').onclick=r
 $('bDel').onclick=()=>{strip.pop();drawStrip()};$('bClr').onclick=()=>{strip=[];drawStrip()};
 $('bHome').onclick=()=>{cur=null;hist=[];render()};$('bBack').onclick=()=>{cur=hist.length?hist.pop():null;render()};
 $('bYes').onclick=()=>{say(L('Да'));logPhrase(L('Да'))};$('bNo').onclick=()=>{say(L('Нет'));logPhrase(L('Нет'))};
-let holdT=null,holdDone=false;
-$('bSpec').onpointerdown=e=>{holdDone=false;if(spec)return;holdT=setTimeout(async()=>{holdDone=true;if(!(await askPin()))return;spec=true;setZoom(true);askPersist();render();settings()},3000)};
-$('bSpec').onpointerup=$('bSpec').onpointerleave=$('bSpec').onpointercancel=()=>{clearTimeout(holdT);holdT=null};
-$('bSpec').onclick=()=>{if(holdDone){holdDone=false;return}if(spec){spec=false;setZoom(false);render()}};
+let holdT=null;
+function stopHold(){clearTimeout(holdT);holdT=null}
+async function openSpecialist(){
+  if(spec||$('modal').classList.contains('on'))return;
+  if(!(await askPin()))return;
+  spec=true;setZoom(true);askPersist();render();settings();$('sPh').focus();
+}
+const specialistButton=$('bSpec');
+specialistButton.onpointerdown=e=>{
+  stopHold();
+  if(e.isPrimary && e.button===0 && !spec)holdT=setTimeout(openSpecialist,3000);
+};
+specialistButton.onpointerup=specialistButton.onpointerleave=specialistButton.onpointercancel=stopHold;
+specialistButton.oncontextmenu=e=>e.preventDefault();
+window.addEventListener('blur',stopHold);
+specialistButton.onclick=()=>{
+  if($('modal').classList.contains('on'))return;
+  if(spec){spec=false;setZoom(false);render();return}
+  // Native keyboard and assistive-technology activation still requires the same PIN.
+  openSpecialist();
+};
 document.querySelectorAll('#langSw [data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 $('specInfo').onclick=()=>spec&&settings();
 window.closeM=closeM;window.say=say;window.__pecs={csv,get S(){return S},strip:()=>phrase(),key:()=>stripKey(),setSpec(v){spec=!!v;render()},setStrip(ids){strip=(ids||[]).slice();drawStrip()},refresh(){save();render()}};
